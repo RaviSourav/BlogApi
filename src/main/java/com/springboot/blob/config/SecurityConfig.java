@@ -1,7 +1,7 @@
 package com.springboot.blob.config;
 
-//import com.springboot.blob.security.JwtAuthenticationEntryPoint;
-//import com.springboot.blob.security.JwtAuthenticationFilter;
+import com.springboot.blob.security.JwtAuthenticationEntryPoint;
+import com.springboot.blob.security.JwtAuthenticationFilter;
 //import io.swagger.v3.oas.annotations.enums.SecuritySchemeType;
 //import io.swagger.v3.oas.annotations.security.SecurityScheme;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,10 +37,13 @@ public class SecurityConfig {
     @Autowired
     private UserDetailsService userDetailsService;
 
-//    private JwtAuthenticationEntryPoint authenticationEntryPoint;
+    @Autowired
+    private JwtAuthenticationEntryPoint authenticationEntryPoint;
 //
-//    private JwtAuthenticationFilter authenticationFilter;
-//
+    @Autowired
+    private JwtAuthenticationFilter authenticationFilter;
+
+//    not using constructor injection
 //    public SecurityConfig(UserDetailsService userDetailsService,
 //                          JwtAuthenticationEntryPoint authenticationEntryPoint,
 //                          JwtAuthenticationFilter authenticationFilter){
@@ -76,13 +79,13 @@ public class SecurityConfig {
 //                                .requestMatchers("/v3/api-docs/**").permitAll()
                                 .anyRequest().authenticated()
 
-//                ).exceptionHandling( exception -> exception
-//                        .authenticationEntryPoint(authenticationEntryPoint)
-//                ).sessionManagement( session -> session
-//                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                ).httpBasic(Customizer.withDefaults());
+                ).exceptionHandling( exception -> exception
+                        .authenticationEntryPoint(authenticationEntryPoint)
+                ).sessionManagement( session -> session
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                );
 
-//        http.addFilterBefore(authenticationFilter, UsernamePasswordAuthenticationFilter.class);
+        http.addFilterBefore(authenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
