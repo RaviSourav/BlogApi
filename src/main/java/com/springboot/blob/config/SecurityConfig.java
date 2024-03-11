@@ -4,6 +4,7 @@ package com.springboot.blob.config;
 //import com.springboot.blob.security.JwtAuthenticationFilter;
 //import io.swagger.v3.oas.annotations.enums.SecuritySchemeType;
 //import io.swagger.v3.oas.annotations.security.SecurityScheme;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -33,7 +34,8 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 //)
 public class SecurityConfig {
 
-//    private UserDetailsService userDetailsService;
+    @Autowired
+    private UserDetailsService userDetailsService;
 
 //    private JwtAuthenticationEntryPoint authenticationEntryPoint;
 //
@@ -52,10 +54,10 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder();
     }
 //
-//    @Bean
-//    public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
-//        return configuration.getAuthenticationManager();
-//    }
+    @Bean
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
+        return configuration.getAuthenticationManager();
+    }
 
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -85,19 +87,19 @@ public class SecurityConfig {
         return http.build();
     }
 
-    @Bean
-    public UserDetailsService userDetailsService(){
-        UserDetails ravi = User.builder()
-                .username("ravi")
-                .password(passwordEncoder().encode("ravi"))
-                .roles("USER")
-                .build();
-
-        UserDetails admin = User.builder()
-                .username("admin")
-                .password(passwordEncoder().encode("admin"))
-                .roles("ADMIN")
-                .build();
-        return new InMemoryUserDetailsManager(ravi, admin);
-    }
+//    @Bean
+//    public UserDetailsService userDetailsService(){
+//        UserDetails ravi = User.builder()
+//                .username("ravi")
+//                .password(passwordEncoder().encode("ravi"))
+//                .roles("USER")
+//                .build();
+//
+//        UserDetails admin = User.builder()
+//                .username("admin")
+//                .password(passwordEncoder().encode("admin"))
+//                .roles("ADMIN")
+//                .build();
+//        return new InMemoryUserDetailsManager(ravi, admin);
+//    }
 }
