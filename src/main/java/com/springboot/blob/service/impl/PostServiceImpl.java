@@ -1,10 +1,12 @@
 package com.springboot.blob.service.impl;
 
+import com.springboot.blob.entity.Category;
 import com.springboot.blob.entity.Post;
 import com.springboot.blob.exception.ArgumentNotValidException;
 import com.springboot.blob.exception.ResourceNotFoundException;
 import com.springboot.blob.payload.PostDto;
 import com.springboot.blob.payload.PostResponse;
+import com.springboot.blob.repository.CategoryRepository;
 import com.springboot.blob.repository.PostRepository;
 import com.springboot.blob.service.PostService;
 import org.modelmapper.ModelMapper;
@@ -30,13 +32,18 @@ public class PostServiceImpl implements PostService {
 
     @Autowired
     private ModelMapper modelMapper;
+
+    @Autowired
+    private CategoryRepository categoryRepository;
     @Override
     public PostDto createPost(PostDto postDto) {
         //if we don't want to use @Valid and wanted to make custom exception according to length of "title" field we can use this
 //        if (postDto.getTitle().length()<2)
 //            throw new ArgumentNotValidException("Post Title should have at least 2 characters");
+        Category category = categoryRepository.findById(postDto.getCategoryId())
+                .orElseThrow(() -> new ResourceNotFoundException("Category", "id", postDto.getCategoryId()));
         Post post = mapToEntity(postDto);
-
+//        post.setCategory(category);
         Post newPost = postRepository.save(post);
 
         return mapToDTO(newPost);
@@ -84,6 +91,9 @@ public class PostServiceImpl implements PostService {
     @Override
     public PostDto updatePost(PostDto postDto, long id) {
         Post post = postRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("post", "id", id));
+        Category category = categoryRepository.findById(postDto.getCategoryId())
+                .orElseThrow(() -> new ResourceNotFoundException("Category", "id", postDto.getCategoryId()));
+        post.setCategory(category);
         post.setTitle(postDto.getTitle());
         post.setDescription(postDto.getDescription());
         post.setContent(postDto.getContent());
@@ -95,6 +105,13 @@ public class PostServiceImpl implements PostService {
 //        postRepository.deleteById(id);
         Post post = postRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("post", "id", id));
         postRepository.delete(post);
+    }
+
+    @Override
+    public List<PostDto> getPostByCategoryId(Long categoryId) {
+        Category category = categoryRepository.findById(categoryId).orElseThrow(()-> new ResourceNotFoundException("Category", "id", categoryId));
+        List<Post> posts = postRepository.findByCategoryId(categoryId);
+        return posts.stream().map(this::mapToDTO).collect(Collectors.toList());
     }
 
     private PostDto mapToDTO(Post post)
