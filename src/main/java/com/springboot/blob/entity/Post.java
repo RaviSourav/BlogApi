@@ -35,6 +35,10 @@ public class Post {
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Comment> comments = new HashSet<>();
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "category_id")
+    private Category category;
+
 
     public Long getId() {
         return id;
@@ -84,6 +88,14 @@ public class Post {
         this.comments = comments;
     }
 
+    public Category getCategory() {
+        return category;
+    }
+
+    public void setCategory(Category category) {
+        this.category = category;
+    }
+
     @Override
     public String toString() {
         return "Post{" +
@@ -94,4 +106,6 @@ public class Post {
                 ", comments=" + comments +
                 '}';
     }
+
+
 }
