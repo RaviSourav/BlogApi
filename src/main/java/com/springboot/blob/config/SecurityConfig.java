@@ -1,9 +1,12 @@
 package com.springboot.blob.config;
 
-//import com.springboot.blob.security.JwtAuthenticationEntryPoint;
-//import com.springboot.blob.security.JwtAuthenticationFilter;
+import com.springboot.blob.security.JwtAuthenticationEntryPoint;
+import com.springboot.blob.security.JwtAuthenticationFilter;
 //import io.swagger.v3.oas.annotations.enums.SecuritySchemeType;
 //import io.swagger.v3.oas.annotations.security.SecurityScheme;
+import io.swagger.v3.oas.annotations.enums.SecuritySchemeType;
+import io.swagger.v3.oas.annotations.security.SecurityScheme;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -25,20 +28,25 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 @Configuration
 @EnableMethodSecurity
-//@SecurityScheme(
-//        name = "Bear Authentication",
-//        type = SecuritySchemeType.HTTP,
-//        bearerFormat = "JWT",
-//        scheme = "bearer"
-//)
+//Adding Authorization Header in Request for Swagger -> this name will be used in controller with @SecurityRequirement
+@SecurityScheme(
+        name = "Bear Authentication",
+        type = SecuritySchemeType.HTTP,
+        bearerFormat = "JWT",
+        scheme = "bearer"
+)
 public class SecurityConfig {
 
-//    private UserDetailsService userDetailsService;
+    @Autowired
+    private UserDetailsService userDetailsService;
 
-//    private JwtAuthenticationEntryPoint authenticationEntryPoint;
+    @Autowired
+    private JwtAuthenticationEntryPoint authenticationEntryPoint;
 //
-//    private JwtAuthenticationFilter authenticationFilter;
-//
+    @Autowired
+    private JwtAuthenticationFilter authenticationFilter;
+
+//    not using constructor injection
 //    public SecurityConfig(UserDetailsService userDetailsService,
 //                          JwtAuthenticationEntryPoint authenticationEntryPoint,
 //                          JwtAuthenticationFilter authenticationFilter){
@@ -52,10 +60,10 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder();
     }
 //
-//    @Bean
-//    public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
-//        return configuration.getAuthenticationManager();
-//    }
+    @Bean
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
+        return configuration.getAuthenticationManager();
+    }
 
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -68,36 +76,36 @@ public class SecurityConfig {
         http.csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests((authorize) ->
                         authorize.requestMatchers(HttpMethod.GET, "/api/**").permitAll()
-//                                .requestMatchers(HttpMethod.GET, "/api/categories/**").permitAll()
-//                                .requestMatchers("/api/auth/**").permitAll()
-//                                .requestMatchers("/swagger-ui/**").permitAll()
-//                                .requestMatchers("/v3/api-docs/**").permitAll()
+//                                .requestMatchers(HttpMethod.POST, "/api/categories/**").permitAll()
+                                .requestMatchers("/api/auth/**").permitAll()
+                                .requestMatchers("/swagger-ui/**").permitAll()
+                                .requestMatchers("/v3/api-docs/**").permitAll()
                                 .anyRequest().authenticated()
 
-//                ).exceptionHandling( exception -> exception
-//                        .authenticationEntryPoint(authenticationEntryPoint)
-//                ).sessionManagement( session -> session
-//                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                ).httpBasic(Customizer.withDefaults());
+                ).exceptionHandling( exception -> exception
+                        .authenticationEntryPoint(authenticationEntryPoint)
+                ).sessionManagement( session -> session
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                );
 
-//        http.addFilterBefore(authenticationFilter, UsernamePasswordAuthenticationFilter.class);
+        http.addFilterBefore(authenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
 
-    @Bean
-    public UserDetailsService userDetailsService(){
-        UserDetails ravi = User.builder()
-                .username("ravi")
-                .password(passwordEncoder().encode("ravi"))
-                .roles("USER")
-                .build();
-
-        UserDetails admin = User.builder()
-                .username("admin")
-                .password(passwordEncoder().encode("admin"))
-                .roles("ADMIN")
-                .build();
-        return new InMemoryUserDetailsManager(ravi, admin);
-    }
+//    @Bean
+//    public UserDetailsService userDetailsService(){
+//        UserDetails ravi = User.builder()
+//                .username("ravi")
+//                .password(passwordEncoder().encode("ravi"))
+//                .roles("USER")
+//                .build();
+//
+//        UserDetails admin = User.builder()
+//                .username("admin")
+//                .password(passwordEncoder().encode("admin"))
+//                .roles("ADMIN")
+//                .build();
+//        return new InMemoryUserDetailsManager(ravi, admin);
+//    }
 }
